@@ -1,5 +1,0 @@
-F:\金山快盘\Visual Studio Projects\XState\XState\XState\bin\Debug\XState.dll
-F:\金山快盘\Visual Studio Projects\XState\XState\XState\bin\Debug\XState.pdb
-F:\金山快盘\Visual Studio Projects\XState\XState\XState\obj\Debug\XState.dll
-F:\金山快盘\Visual Studio Projects\XState\XState\XState\obj\Debug\XState.pdb
-F:\金山快盘\Visual Studio Projects\XState\XState\XState\obj\Debug\XState.csprojResolveAssemblyReference.cache

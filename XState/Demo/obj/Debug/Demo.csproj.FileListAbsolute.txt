@@ -1,8 +1,0 @@
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\obj\Debug\Demo.csprojResolveAssemblyReference.cache
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\bin\Debug\Demo.exe.config
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\bin\Debug\Demo.exe
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\bin\Debug\Demo.pdb
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\bin\Debug\XState.dll
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\bin\Debug\XState.pdb
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\obj\Debug\Demo.exe
-F:\金山快盘\Visual Studio Projects\XState\XState\Demo\obj\Debug\Demo.pdb
