@@ -9,41 +9,135 @@ namespace Demo
 {
     class Program
     {
+        class OrderState
+        {
+            public const string Initial = "Initial";
+            public const string Pending = "Pending";
+            public const string Passed = "Passed";
+            public const string Rejected = "Rejected";
+            public const string Shipping = "Shipping";
+            public const string Finished = "Finished";
+        }
+
+        class OrderInput
+        {
+            public const string Submit = "Submit";
+            public const string Agree = "Agree";
+            public const string Deny = "Deny";
+            public const string I_Know = "I_Know";
+            public const string I_Edit = "I_Edit";
+            public const string OK = "OK";
+        }
+
         static void Main(string[] args)
         {
-            StateMachine<string, int, int> sm = new StateMachine<string, int, int>("A");
 
-            sm.CreateState("A").Rule(1, "B",1000).Rule(2, "C",3000)
-                .OnEntry((fromState, input, output) =>
-                {
-                    Console.Write(string.Format("OnEntry;"));
-                    Console.Write(string.Format("From state {0};", fromState));
-                    Console.Write(string.Format("Input is {0};", input));
-                    Console.WriteLine(string.Format("Output is {0};", output));
+            StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
-                }).OnQuit((toState, input, output) =>
+            //orderStateMachine.SetCurrentStateTo(OrderState.Initial);
+            //orderStateMachine.ChangeState(OrderInput.Submit);
+            //orderStateMachine.ChangeState(OrderInput.Deny);
+            //orderStateMachine.ChangeState(OrderInput.I_Edit);
+            //orderStateMachine.ChangeState(OrderInput.Agree);
+            //orderStateMachine.ChangeState(OrderInput.Agree);
+            //orderStateMachine.ChangeState(OrderInput.OK);
+
+
+            orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Agree);
+            orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Deny);
+
+        }
+
+        static StateMachine<string, string, string> InitalStateMachine()
+        {
+
+            StateMachine<string, string, string> orderStateMachine = new StateMachine<string, string, string>("订单状态机");
+
+            orderStateMachine.CreateState(OrderState.Initial)
+                .AsOriginalState()
+                .Rule(OrderInput.Submit, OrderState.Pending, "提交成功，转入Pending状态")
+                .OnQuit((toState, input, output) =>
                 {
-                    Console.Write(string.Format("OnQuit;"));
-                    Console.Write(string.Format("To state {0};", toState));
-                    Console.Write(string.Format("Input is {0};", input));
-                    Console.WriteLine(string.Format("Output is {0};", output));
+                    Console.Write(string.Format("离开状态Initial;"));
+                    Console.Write(string.Format("前往状态{0};", toState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
                 });
 
-            sm.CreateState("B").Rule(1, "C").Rule(0, "A");
-            sm.CreateState("C");
-            Console.WriteLine(sm.ChangeState(1).CurrentState);
-            Console.WriteLine(sm.ChangeState(0).CurrentState);
-            Console.WriteLine(sm.ChangeState(2).CurrentState);
+            orderStateMachine.CreateState(OrderState.Pending)
+                .Rule(OrderInput.Agree, OrderState.Passed, "已经批准，转入Passed状态")
+                .Rule(OrderInput.Deny, OrderState.Rejected, "已经否决，转入Rejected状态")
+                .OnQuit((toState, input, output) =>
+                {
+                    Console.Write(string.Format("离开状态Pending;"));
+                    Console.Write(string.Format("前往状态{0};", toState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                });
 
-            Console.WriteLine(sm.CurrentState);
-            Console.WriteLine(sm.CanChangeTo("A","C"));
-            Console.WriteLine(sm.CanChangeTo("B"));
+            orderStateMachine.CreateState(OrderState.Passed)
+                .Rule(OrderInput.Agree, OrderState.Shipping, "已经批准，转入Shipping状态")
+                .OnEntry((fromState, input, output) =>
+                {
+                    Console.Write(string.Format("进入状态Passed;"));
+                    Console.Write(string.Format("先前状态{0};", fromState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                })
+                .OnQuit((toState, input, output) =>
+                {
+                    Console.Write(string.Format("离开状态Passed;"));
+                    Console.Write(string.Format("前往状态{0};", toState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                });
 
-            foreach(var s in sm.AllStates)
-            {
-                Console.WriteLine(s);
+            orderStateMachine.CreateState(OrderState.Rejected)
+               .Rule(OrderInput.I_Know, OrderState.Finished, "已经知晓，转入Finished状态")
+               .Rule(OrderInput.I_Edit, OrderState.Pending, "已经修改，转入Pending状态")
+               .OnEntry((fromState, input, output) =>
+               {
+                   Console.Write(string.Format("进入状态Rejected;"));
+                   Console.Write(string.Format("先前状态{0};", fromState));
+                   Console.Write(string.Format("输入：{0};", input));
+                   Console.WriteLine(string.Format("输出：{0};", output));
+               })
+               .OnQuit((toState, input, output) =>
+               {
+                   Console.Write(string.Format("离开状态Rejected;"));
+                   Console.Write(string.Format("前往状态{0};", toState));
+                   Console.Write(string.Format("输入：{0};", input));
+                   Console.WriteLine(string.Format("输出：{0};", output));
+               });
 
-            }
+
+            orderStateMachine.CreateState(OrderState.Shipping)
+                .Rule(OrderInput.OK, OrderState.Finished, "已经OK，转入Finished状态")
+                .OnEntry((fromState, input, output) =>
+                {
+                    Console.Write(string.Format("进入状态Shipping;"));
+                    Console.Write(string.Format("先前状态{0};", fromState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                })
+                .OnQuit((toState, input, output) =>
+                {
+                    Console.Write(string.Format("离开状态Shipping;"));
+                    Console.Write(string.Format("前往状态{0};", toState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                });
+
+            orderStateMachine.CreateState(OrderState.Finished)
+                .OnEntry((fromState, input, output) =>
+                {
+                    Console.Write(string.Format("进入状态Finished;"));
+                    Console.Write(string.Format("先前状态{0};", fromState));
+                    Console.Write(string.Format("输入：{0};", input));
+                    Console.WriteLine(string.Format("输出：{0};", output));
+                });
+
+            return orderStateMachine;
         }
     }
 }

@@ -34,6 +34,12 @@ namespace XState
                 return this;
             }
 
+            public StateConfiguration AsOriginalState()
+            {
+                Owner.OriginalState = this.State;
+                return this;
+            }
+
             public StateConfiguration OnEntry(DelegateEntryAction entryAction)
             {
                 EntryAction += entryAction;
@@ -57,6 +63,8 @@ namespace XState
                 if (QuitAction != null)
                     QuitAction(toState, input, output);
             }
+
+            public StateMachine<TState, TInput, TOutput> Owner { get; set; }
         }
     }
 }

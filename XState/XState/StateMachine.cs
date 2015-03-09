@@ -8,22 +8,45 @@ namespace XState
 {
     public partial class StateMachine<TState, TInput, TOutput>
     {
-        public TState OriginalState { private set; get; }
-        public StateMachine(TState _initial)
+        public TState OriginalState { internal set; get; }
+
+        public string StateMachineName { set; get; }
+        public StateMachine()
         {
-            OriginalState = _initial;
-            CurrentState = _initial;
+
+        }
+        public StateMachine(TState initialState)
+        {
+            OriginalState = initialState;
+            CurrentState = initialState;
+        }
+
+        public StateMachine(string stateMachineName)
+        {
+            StateMachineName = stateMachineName ?? "";
+        }
+
+        public StateMachine(TState initialState, string stateMachineName)
+            : this(initialState)
+        {
+            StateMachineName = stateMachineName ?? "";
         }
 
         public TState CurrentState { private set; get; }
 
-        public StateConfiguration CreateState(TState _state)
+        public StateMachine<TState, TInput, TOutput> SetCurrentStateTo(TState currentState)
+        {
+            this.CurrentState = currentState;
+            return this;
+        }
+        public StateConfiguration CreateState(TState state)
         {
             StateConfiguration stateConfiguration = null;
-            if (!Configurations.TryGetValue(_state, out stateConfiguration))
+            if (!Configurations.TryGetValue(state, out stateConfiguration))
             {
-                stateConfiguration = new StateConfiguration(_state);
-                Configurations.Add(_state, stateConfiguration);
+                stateConfiguration = new StateConfiguration(state);
+                stateConfiguration.Owner = this;
+                Configurations.Add(state, stateConfiguration);
             }
 
             return stateConfiguration;
@@ -61,7 +84,7 @@ namespace XState
             }
             else
             {
-                throw new InvalidStateException(input.ToString());
+                throw new InvalidInputException(input.ToString());
                 //output = default(TOutput);
                 //return this;
             }
@@ -101,7 +124,7 @@ namespace XState
             }
         }
 
-        public bool CanChangeTo(TState fromState,TState toState)
+        public bool CanChangeTo(TState fromState, TState toState)
         {
             if (!ContainsState(fromState) || !ContainsState(toState))
                 return false;
