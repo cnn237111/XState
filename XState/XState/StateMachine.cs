@@ -23,7 +23,7 @@ namespace XState
         /// 状态机名字
         /// </summary>
         public string StateMachineName { private set; get; }
-        
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -88,10 +88,11 @@ namespace XState
 
         }
 
+        private Dictionary<TState, StateConfiguration> _configurations = new Dictionary<TState, StateConfiguration>();
         /// <summary>
         /// 状态机的配置信息表
         /// </summary>
-        internal Dictionary<TState, StateConfiguration> Configurations = new Dictionary<TState, StateConfiguration>();
+        internal Dictionary<TState, StateConfiguration> Configurations { get { return _configurations; } }
 
         /// <summary>
         /// 改变状态

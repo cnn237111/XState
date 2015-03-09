@@ -34,7 +34,7 @@ namespace Demo
 
             StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
-            #region 连续转换状态的示例
+            #region 从初始状态连续转换的示例
             orderStateMachine.SetCurrentStateTo(OrderState.Initial)
                 .ChangeState(OrderInput.Submit)
                 .ChangeState(OrderInput.Deny)
@@ -57,7 +57,6 @@ namespace Demo
         {
 
             StateMachine<string, string, string> orderStateMachine = new StateMachine<string, string, string>("订单状态机");
-
             orderStateMachine.CreateState(OrderState.Initial)
                 .AsOriginalState()//设置成初始状态
                 .Rule(OrderInput.Submit, OrderState.Pending, "提交成功，转入Pending状态")
