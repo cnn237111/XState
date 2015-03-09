@@ -63,7 +63,9 @@ namespace XState
                 if (QuitAction != null)
                     QuitAction(toState, input, output);
             }
-
+            /// <summary>
+            /// 该配置所属的Owner状态机
+            /// </summary>
             public StateMachine<TState, TInput, TOutput> Owner { get; set; }
         }
     }

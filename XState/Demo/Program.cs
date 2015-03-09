@@ -34,17 +34,22 @@ namespace Demo
 
             StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
-            //orderStateMachine.SetCurrentStateTo(OrderState.Initial);
-            //orderStateMachine.ChangeState(OrderInput.Submit);
-            //orderStateMachine.ChangeState(OrderInput.Deny);
-            //orderStateMachine.ChangeState(OrderInput.I_Edit);
-            //orderStateMachine.ChangeState(OrderInput.Agree);
-            //orderStateMachine.ChangeState(OrderInput.Agree);
-            //orderStateMachine.ChangeState(OrderInput.OK);
+            #region 连续转换状态的示例
+            orderStateMachine.SetCurrentStateTo(OrderState.Initial)
+                .ChangeState(OrderInput.Submit)
+                .ChangeState(OrderInput.Deny)
+                .ChangeState(OrderInput.I_Edit)
+                .ChangeState(OrderInput.Agree)
+                .ChangeState(OrderInput.Agree)
+                .ChangeState(OrderInput.OK);
+            #endregion
 
 
+            #region 任意状态转换
             orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Agree);
             orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Deny);
+            #endregion
+
 
         }
 
@@ -54,7 +59,7 @@ namespace Demo
             StateMachine<string, string, string> orderStateMachine = new StateMachine<string, string, string>("订单状态机");
 
             orderStateMachine.CreateState(OrderState.Initial)
-                .AsOriginalState()
+                .AsOriginalState()//设置成初始状态
                 .Rule(OrderInput.Submit, OrderState.Pending, "提交成功，转入Pending状态")
                 .OnQuit((toState, input, output) =>
                 {

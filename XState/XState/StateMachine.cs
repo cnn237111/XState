@@ -6,39 +6,74 @@ using System.Threading.Tasks;
 
 namespace XState
 {
+    /// <summary>
+    /// 状态机类
+    /// </summary>
+    /// <typeparam name="TState">状态的类型</typeparam>
+    /// <typeparam name="TInput">输入的类型</typeparam>
+    /// <typeparam name="TOutput">输出的类型</typeparam>
     public partial class StateMachine<TState, TInput, TOutput>
     {
+        /// <summary>
+        /// 状态机初始状态
+        /// </summary>
         public TState OriginalState { internal set; get; }
 
-        public string StateMachineName { set; get; }
-        public StateMachine()
-        {
-
-        }
+        /// <summary>
+        /// 状态机名字
+        /// </summary>
+        public string StateMachineName { private set; get; }
+        
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="initialState">初始状态</param>
         public StateMachine(TState initialState)
         {
             OriginalState = initialState;
             CurrentState = initialState;
         }
 
-        public StateMachine(string stateMachineName)
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="stateMachineName">状态机名称</param>
+        public StateMachine(string stateMachineName = null)
         {
             StateMachineName = stateMachineName ?? "";
         }
 
-        public StateMachine(TState initialState, string stateMachineName)
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="initialState">初始状态</param>
+        /// <param name="stateMachineName">状态机名称</param>
+        public StateMachine(TState initialState, string stateMachineName = null)
             : this(initialState)
         {
-            StateMachineName = stateMachineName ?? "";
+            StateMachineName = string.IsNullOrEmpty(stateMachineName) ? Guid.NewGuid().ToString() : stateMachineName;
         }
 
+        /// <summary>
+        /// 当前状态
+        /// </summary>
         public TState CurrentState { private set; get; }
 
-        public StateMachine<TState, TInput, TOutput> SetCurrentStateTo(TState currentState)
+        /// <summary>
+        /// 设置当前状态为
+        /// </summary>
+        /// <param name="toState">需要转换为当前状态</param>
+        /// <returns></returns>
+        public StateMachine<TState, TInput, TOutput> SetCurrentStateTo(TState toState)
         {
-            this.CurrentState = currentState;
+            this.CurrentState = toState;
             return this;
         }
+        /// <summary>
+        /// 创建状态
+        /// </summary>
+        /// <param name="state">创建状态</param>
+        /// <returns>状态机本身</returns>
         public StateConfiguration CreateState(TState state)
         {
             StateConfiguration stateConfiguration = null;
@@ -53,8 +88,18 @@ namespace XState
 
         }
 
+        /// <summary>
+        /// 状态机的配置信息表
+        /// </summary>
         internal Dictionary<TState, StateConfiguration> Configurations = new Dictionary<TState, StateConfiguration>();
 
+        /// <summary>
+        /// 改变状态
+        /// </summary>
+        /// <param name="fromState">源状态</param>
+        /// <param name="input">输入</param>
+        /// <param name="output">输出</param>
+        /// <returns>状态机本身</returns>
         public StateMachine<TState, TInput, TOutput> ChangeState(TState fromState, TInput input, out TOutput output)
         {
             StateConfiguration conf;
@@ -90,19 +135,43 @@ namespace XState
             }
 
         }
+        /// <summary>
+        /// 改变状态，以当前状态为源状态
+        /// </summary>
+        /// <param name="input">输入</param>
+        /// <param name="output">输出</param>
+        /// <returns>状态机本身</returns>
         public StateMachine<TState, TInput, TOutput> ChangeState(TInput input, out TOutput output)
         {
             return ChangeState(this.CurrentState, input, out output);
         }
+
+        /// <summary>
+        /// 改变状态
+        /// </summary>
+        /// <param name="fromState">源状态</param>
+        /// <param name="input">输入</param>
+        /// <returns>状态机本身</returns>
         public StateMachine<TState, TInput, TOutput> ChangeState(TState fromState, TInput input)
         {
             TOutput output;
             return ChangeState(fromState, input, out  output);
         }
+        /// <summary>
+        /// 改变状态
+        /// </summary>
+        /// <param name="input">输入</param>
+        /// <returns>状态机本身</returns>
         public StateMachine<TState, TInput, TOutput> ChangeState(TInput input)
         {
             return ChangeState(this.CurrentState, input);
         }
+
+        /// <summary>
+        /// 获取状态配置信息
+        /// </summary>
+        /// <param name="state">状态</param>
+        /// <returns>状态配置，无效状态会导致异常</returns>
         public StateConfiguration GetStateConfiguration(TState state)
         {
             if (ContainsState(state))
@@ -111,11 +180,19 @@ namespace XState
                 throw new InvalidStateException(state.ToString());
         }
 
+        /// <summary>
+        /// 检测是否包含某状态
+        /// </summary>
+        /// <param name="state">状态</param>
+        /// <returns>包含则返回True</returns>
         public bool ContainsState(TState state)
         {
             return Configurations.ContainsKey(state);
         }
 
+        /// <summary>
+        /// 返回所有的状态集合
+        /// </summary>
         public IEnumerable<TState> AllStates
         {
             get
@@ -124,6 +201,12 @@ namespace XState
             }
         }
 
+        /// <summary>
+        /// 判断两个状态之间转换是否合法
+        /// </summary>
+        /// <param name="fromState">源状态</param>
+        /// <param name="toState">目标状态</param>
+        /// <returns>合法则返回Ture，反之则反</returns>
         public bool CanChangeTo(TState fromState, TState toState)
         {
             if (!ContainsState(fromState) || !ContainsState(toState))
@@ -132,6 +215,11 @@ namespace XState
             return conf.Triggers.Where(x => x.NextState.Equals(toState)).Count() > 0;
         }
 
+        /// <summary>
+        /// 判断当前状态转换到目标状态是否合法
+        /// </summary>
+        /// <param name="toState"></param>
+        /// <returns>合法则返回Ture，反之则反</returns>
         public bool CanChangeTo(TState toState)
         {
             return CanChangeTo(this.CurrentState, toState);
