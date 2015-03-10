@@ -20,7 +20,7 @@ namespace XState
             public StateConfiguration(TState state)
             {
                 State = state;
-                Triggers = new List<Trigger>();
+                Triggers = new SortedSet<Trigger>();
             }
 
             /// <summary>
@@ -31,7 +31,7 @@ namespace XState
             /// <summary>
             /// 状态触发规则
             /// </summary>
-            public List<Trigger> Triggers { private set; get; }
+            public SortedSet<Trigger> Triggers { private set; get; }
             
             /// <summary>
             /// 进入状态的委托方法

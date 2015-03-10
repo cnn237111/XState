@@ -46,8 +46,15 @@ namespace Demo
 
 
             #region 任意状态转换
-            orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Agree);
-            orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Deny);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Agree).CurrentState);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Pending, OrderInput.Deny).CurrentState);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Rejected, OrderInput.I_Edit).CurrentState);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Rejected, OrderInput.I_Know).CurrentState);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Shipping, OrderInput.OK).CurrentState);
+
+            //此处是无效输入，导致异常InvalidInputException
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Finished, OrderInput.Deny).CurrentState);
+
             #endregion
 
 
