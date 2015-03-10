@@ -115,11 +115,19 @@ namespace XState
             {
                 output = trigger.Output;
 
-                if (conf.DlgAbortWhen != null && conf.DlgAbortWhen(input, output))
+                if (conf.DlgAbortWhen != null)
                 {
-                    if (conf.AbortAction != null)
-                        conf.AbortAction();
-                    return this;
+                    foreach (Delegate dele in conf.DlgAbortWhen.GetInvocationList())
+                    {
+                        bool IsAbort = ((StateConfiguration.DelegateAbortWhen)dele)(input, output);
+                        if (IsAbort)    //如果放弃执行
+                        {
+                            if (conf.AbortAction != null)
+                                conf.AbortAction();
+                            return this;
+                        }
+                    }
+
                 }
 
                 this.CurrentState = trigger.NextState;
@@ -138,7 +146,7 @@ namespace XState
             }
             else
             {
-                throw new InvalidInputException(this.CurrentState.ToString(),input.ToString());
+                throw new InvalidInputException(this.CurrentState.ToString(), input.ToString());
                 //output = default(TOutput);
                 //return this;
             }

@@ -132,7 +132,7 @@ namespace XState
             /// <returns>返回自身</returns>
             public StateConfiguration AbortWhen(DelegateAbortWhen delegateAbortWhen)
             {
-                DlgAbortWhen = delegateAbortWhen;
+                DlgAbortWhen += delegateAbortWhen;
                 return this;
             }
 
@@ -143,7 +143,7 @@ namespace XState
             /// <returns></returns>
             public StateConfiguration IfAbort(Action action)
             {
-                AbortAction = action;
+                AbortAction += action;
                 return this;
             }
 
