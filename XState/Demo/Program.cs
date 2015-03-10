@@ -34,6 +34,11 @@ namespace Demo
 
             StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
+
+            orderStateMachine.SetCurrentStateTo(OrderState.Initial)
+                .ChangeState(OrderInput.Submit);
+
+
             #region 从初始状态连续转换的示例
             orderStateMachine.SetCurrentStateTo(OrderState.Initial)
                 .ChangeState(OrderInput.Submit)
@@ -73,7 +78,9 @@ namespace Demo
                     Console.Write(string.Format("前往状态{0};", toState));
                     Console.Write(string.Format("输入：{0};", input));
                     Console.WriteLine(string.Format("输出：{0};", output));
-                });
+                })
+                .AbortWhen((input, output) => { return DateTime.Now.Hour == 19; })
+                .IfAbort(() => { Console.Write(string.Format("状态转换放弃，19点时不能进行转换")); });
 
             orderStateMachine.CreateState(OrderState.Pending)
                 .Rule(OrderInput.Agree, OrderState.Passed, "已经批准，转入Passed状态")

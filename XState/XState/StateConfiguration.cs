@@ -32,7 +32,8 @@ namespace XState
             /// 状态触发规则
             /// </summary>
             public SortedSet<Trigger> Triggers { private set; get; }
-            
+
+            #region 此处定义委托和事件
             /// <summary>
             /// 进入状态的委托方法
             /// </summary>
@@ -40,7 +41,7 @@ namespace XState
             /// <param name="input">输入</param>
             /// <param name="output">输出</param>
             public delegate void DelegateEntryAction(TState fromState, TInput input, TOutput output);
-            
+
             /// <summary>
             /// 离开状态的委托方法
             /// </summary>
@@ -50,13 +51,29 @@ namespace XState
             public delegate void DelegateQuitAction(TState toState, TInput input, TOutput output);
 
             /// <summary>
+            /// 当满足条件时，放弃状态转移
+            /// </summary>
+            /// <param name="input">输入</param>
+            /// <param name="output">输出</param>
+            public delegate bool DelegateAbortWhen(TInput input, TOutput output);
+
+            /// <summary>
             ///进入状态是触发的事件
             /// </summary>
             internal event DelegateEntryAction EntryAction;
+
             /// <summary>
             /// 离开状态触发的事件
             /// </summary>
             internal event DelegateQuitAction QuitAction;
+
+            /// <summary>
+            /// 委托方法检测是否需要放弃状态变更
+            /// </summary>
+            internal DelegateAbortWhen DlgAbortWhen;
+
+            internal Action AbortAction;
+            #endregion
 
             /// <summary>
             /// 设定状态转移规则
@@ -96,14 +113,37 @@ namespace XState
                 EntryAction += entryAction;
                 return this;
             }
+
             /// <summary>
             /// 离开状态触发的方法调用
             /// </summary>
             /// <param name="quitAction">委托方法</param>
-            /// <returns></returns>
+            /// <returns>返回自身</returns>
             public StateConfiguration OnQuit(DelegateQuitAction quitAction)
             {
                 QuitAction += quitAction;
+                return this;
+            }
+
+            /// <summary>
+            /// 当满足某个条件的时候，放弃状态变更
+            /// </summary>
+            /// <param name="delegateAbortWhen">判断是否放弃状态变更的逻辑，返回True时则放弃</param>
+            /// <returns>返回自身</returns>
+            public StateConfiguration AbortWhen(DelegateAbortWhen delegateAbortWhen)
+            {
+                DlgAbortWhen = delegateAbortWhen;
+                return this;
+            }
+
+            /// <summary>
+            /// 如果放弃状态转换
+            /// </summary>
+            /// <param name="action"></param>
+            /// <returns></returns>
+            public StateConfiguration IfAbort(Action action)
+            {
+                AbortAction = action;
                 return this;
             }
 

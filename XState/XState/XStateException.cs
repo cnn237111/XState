@@ -14,7 +14,7 @@ namespace XState
 
     class InvalidInputException : Exception
     {
-        public InvalidInputException(string value)
-            : base(String.Format("Invalid input Value. Value: {0}", value)) { }
+        public InvalidInputException(string currentState, string input)
+            : base(String.Format("Invalid input Value. {Current State:{0},Input:{1}}", currentState, input)) { }
     }
 }

@@ -114,6 +114,14 @@ namespace XState
             if (trigger != null && trigger.Input.Equals(input))
             {
                 output = trigger.Output;
+
+                if (conf.DlgAbortWhen != null && conf.DlgAbortWhen(input, output))
+                {
+                    if (conf.AbortAction != null)
+                        conf.AbortAction();
+                    return this;
+                }
+
                 this.CurrentState = trigger.NextState;
 
                 //trigger EntryAction
@@ -130,7 +138,7 @@ namespace XState
             }
             else
             {
-                throw new InvalidInputException(input.ToString());
+                throw new InvalidInputException(this.CurrentState.ToString(),input.ToString());
                 //output = default(TOutput);
                 //return this;
             }
