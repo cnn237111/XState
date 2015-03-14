@@ -12,12 +12,18 @@ namespace XState
     /// <typeparam name="TState">状态的类型</typeparam>
     /// <typeparam name="TInput">输入的类型</typeparam>
     /// <typeparam name="TOutput">输出的类型</typeparam>
-    public partial class StateMachine<TState, TInput, TOutput>
+    public partial class StateMachine<TState, TInput, TOutput> where TState : IEquatable<TState>
     {
         /// <summary>
         /// 状态机初始状态
         /// </summary>
         public TState OriginalState { internal set; get; }
+
+
+        /// <summary>
+        /// 状态机终结状态
+        /// </summary>
+        public TState FinalState { internal set; get; }
 
         /// <summary>
         /// 状态机名字
@@ -63,12 +69,28 @@ namespace XState
         /// 设置当前状态为
         /// </summary>
         /// <param name="toState">需要转换为当前状态</param>
-        /// <returns></returns>
+        /// <returns>状态机自身</returns>
         public StateMachine<TState, TInput, TOutput> SetCurrentStateTo(TState toState)
         {
             this.CurrentState = toState;
             return this;
         }
+
+        /// <summary>
+        /// 重置状态机至初始化状态
+        /// </summary>
+        /// <returns>状态机自身</returns>
+        public StateMachine<TState, TInput, TOutput> Reset()
+        {
+            this.CurrentState = OriginalState;
+            return this;
+        }
+
+        public bool IsFinal()
+        {
+            return this.CurrentState.Equals(this.FinalState);
+        }
+
         /// <summary>
         /// 创建状态
         /// </summary>
@@ -240,6 +262,46 @@ namespace XState
         public bool CanChangeTo(TState toState)
         {
             return CanChangeTo(this.CurrentState, toState);
+        }
+
+        /// <summary>
+        /// 查找某个状态后续状态
+        /// </summary>
+        /// <param name="state">某状态</param>
+        /// <returns>返回后续状态的列表</returns>
+        public List<TState> FindNextState(TState state)
+        {
+            var conf=GetStateConfiguration(state);
+            return conf.Triggers.Select(x => x.NextState).ToList();
+        }
+
+        /// <summary>
+        /// 查找某个状态前续状态
+        /// </summary>
+        /// <param name="state">某状态</param>
+        /// <returns>返回前续状态的列表</returns>
+        public List<TState> FindPreviousState(TState state)
+        {
+            List<TState> lstPreviousState = new List<TState>(); 
+            foreach(var conf in Configurations)
+            {
+                if( conf.Value.Triggers.Where(x=>x.NextState.Equals(state)).Count()>0)
+                {
+                    lstPreviousState.Add(conf.Value.State);
+                }
+            }
+            return lstPreviousState;
+        }
+
+        /// <summary>
+        /// 查找某个状态的可输入值
+        /// </summary>
+        /// <param name="state">某状态</param>
+        /// <returns>返回某个状态的可接受的输入值</returns>
+        public List<TInput> GetValidInputs(TState state)
+        {
+            var conf = GetStateConfiguration(state);
+            return conf.Triggers.Select(x => x.Input).ToList();
         }
     }
 }

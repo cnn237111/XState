@@ -32,8 +32,13 @@ namespace Demo
         static void Main(string[] args)
         {
 
+
             StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
+
+            var lst = orderStateMachine.FindPreviousState(OrderState.Finished);
+
+            return;
 
             orderStateMachine.SetCurrentStateTo(OrderState.Initial)
                 .ChangeState(OrderInput.Submit);
@@ -159,6 +164,15 @@ namespace Demo
                 });
 
             return orderStateMachine;
+        }
+    }
+
+    class testclass : IEquatable<testclass>
+    {
+        public string name;
+        public bool Equals(testclass other)
+        {
+            return other.name == this.name;
         }
     }
 }

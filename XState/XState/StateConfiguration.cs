@@ -24,7 +24,7 @@ namespace XState
             }
 
             /// <summary>
-            /// 待配置的状态
+            /// 状态，所有的配置都是针对这一状态所为
             /// </summary>
             public TState State { private set; get; }
 
@@ -104,6 +104,17 @@ namespace XState
             }
 
             /// <summary>
+            /// 将该状态设为状态机中的初始状态
+            /// </summary>
+            /// <returns>返回配置项本身</returns>
+            public StateConfiguration AsFinalState()
+            {
+                Owner.FinalState = this.State;
+                return this;
+            }
+
+
+            /// <summary>
             /// 进入状态触发的方法调用
             /// </summary>
             /// <param name="entryAction">委托方法</param>
@@ -175,5 +186,6 @@ namespace XState
             /// </summary>
             public StateMachine<TState, TInput, TOutput> Owner { get; set; }
         }
+
     }
 }
