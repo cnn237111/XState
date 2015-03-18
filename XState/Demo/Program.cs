@@ -35,6 +35,15 @@ namespace Demo
 
             StateMachine<string, string, string> orderStateMachine = InitalStateMachine();
 
+
+            var lst = orderStateMachine.FindPreviousState(OrderState.Finished);
+
+            return;
+
+            orderStateMachine.SetCurrentStateTo(OrderState.Initial)
+                .ChangeState(OrderInput.Submit);
+
+            return;
             #region 从初始状态连续转换的示例
             orderStateMachine.SetCurrentStateTo(OrderState.Initial)
                 .ChangeState(OrderInput.Submit)
@@ -54,7 +63,7 @@ namespace Demo
             Console.WriteLine(orderStateMachine.ChangeState(OrderState.Shipping, OrderInput.OK).CurrentState);
 
             //此处是无效输入，导致异常InvalidInputException
-            //Console.WriteLine(orderStateMachine.ChangeState(OrderState.Finished, OrderInput.Deny).CurrentState);
+            Console.WriteLine(orderStateMachine.ChangeState(OrderState.Finished, OrderInput.Deny).CurrentState);
 
             #endregion
 
@@ -75,6 +84,7 @@ namespace Demo
                     Console.Write(string.Format("输入：{0};", input));
                     Console.WriteLine(string.Format("输出：{0};", output));
                 })
+
                 .AbortWhen((input, output) => { return DateTime.Now.Hour == 21; })
                 .AbortWhen((input, output) => { return DateTime.Now.Hour == 22; })
                 .IfAbort(() => { Console.WriteLine(string.Format("状态转换放弃，22点时不能进行转换")); })
@@ -157,4 +167,12 @@ namespace Demo
         }
     }
 
+    class testclass : IEquatable<testclass>
+    {
+        public string name;
+        public bool Equals(testclass other)
+        {
+            return other.name == this.name;
+        }
+    }
 }
